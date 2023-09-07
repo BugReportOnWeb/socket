@@ -39,12 +39,12 @@ The server will start listening on a specified port.
 ./client
 ```
 
-The client will connect to the server, send a message, and display the received message from the server.
+The client will connect to the server and display the received message from the server.
 
 ## Code Overview
 
 - `server.c`: Contains the code for the server-side of the example. It listens for incoming connections and handles client requests.
-- `client.c`: Contains the code for the client-side of the example. It connects to the server and communicates by sending and receiving messages.
+- `client.c`: Contains the code for the client-side of the example. It connects to the server and communicates by sending or receiving messages.
 
 ## Customization
 
