@@ -76,4 +76,6 @@ int main(int argc, char **argv) {
 
     // Cleaning up by closing the socket
     close(new_fd);
+
+    return 0;
 }
