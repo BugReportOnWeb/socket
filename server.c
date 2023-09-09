@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
     }
 
     while (1) {
-        // Receiving message from client
+        // Receiving message from the client
         bzero(buf, sizeof buf);
         len = sizeof buf; 
         bytes_recv = recv(new_fd, buf, len - 1, 0);
@@ -78,12 +78,16 @@ int main(int argc, char **argv) {
             return 1;
         }
 
+        // Printing and clearing buffer
         buf[bytes_recv] = '\0';
         printf("Client: %s\n", buf);
+
+        status = strncmp("Bye", buf, 3);
+        if (status == 0) break;
+
         bzero(buf, sizeof buf);
 
         // Sending message to the client
-        bzero(msg, sizeof msg);
         printf("You: ");
         scanf("%[^\n]%*c", msg);
 
@@ -95,12 +99,12 @@ int main(int argc, char **argv) {
             return 1;
         }
 
-        bzero(msg, sizeof msg);
+        status = strncmp("Bye", msg, 3);
+        if (status == 0) break;
     }
 
     // Cleaning up by closing the socket
     close(new_fd);
-    close(sockfd);
 
     return 0;
 }

@@ -59,6 +59,9 @@ int main(int argc, char **argv) {
             return 1;
         }
 
+        status = strncmp("Bye", msg, 3);
+        if (status == 0) break;
+
         // Receive message from the server
         bzero(buf, sizeof buf);
         len = sizeof buf; 
@@ -69,8 +72,13 @@ int main(int argc, char **argv) {
             return 1;
         }
 
+        // Printing and clearing buffer
         buf[bytes_recv] = '\0';
         printf("Server: %s\n", buf);
+
+        status = strncmp("Bye", buf, 3);
+        if (status == 0) break;
+
         bzero(buf, sizeof buf);
     }
 
