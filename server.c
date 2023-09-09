@@ -7,6 +7,7 @@
 
 #define PORT "3490"
 #define BACKLOG 10
+#define MAX_LEN 256
 
 int main(int argc, char **argv) {
     struct addrinfo hints, *res;
@@ -15,9 +16,10 @@ int main(int argc, char **argv) {
     struct sockaddr_storage cli_addr;
     socklen_t addr_size;
 
-    const char *msg = "Dev was here!";
+    char msg[MAX_LEN];
+    char buf[MAX_LEN];
     size_t len;
-    ssize_t bytes_send;
+    ssize_t bytes_send, bytes_recv;
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET;          // IPv4
@@ -65,17 +67,40 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    // Sending message to the client
-    len = strlen(msg);
-    bytes_send = send(new_fd, msg, len, 0);
+    while (1) {
+        // Receiving message from client
+        bzero(buf, sizeof buf);
+        len = sizeof buf; 
+        bytes_recv = recv(new_fd, buf, len - 1, 0);
 
-    if (bytes_send == -1) {
-        perror("send");
-        return 1;
+        if (bytes_recv == -1) {
+            perror("recv");
+            return 1;
+        }
+
+        buf[bytes_recv] = '\0';
+        printf("Client: %s\n", buf);
+        bzero(buf, sizeof buf);
+
+        // Sending message to the client
+        bzero(msg, sizeof msg);
+        printf("You: ");
+        scanf("%[^\n]%*c", msg);
+
+        len = strlen(msg);
+        bytes_send = send(new_fd, msg, len, 0);
+
+        if (bytes_send == -1) {
+            perror("send");
+            return 1;
+        }
+
+        bzero(msg, sizeof msg);
     }
 
     // Cleaning up by closing the socket
     close(new_fd);
+    close(sockfd);
 
     return 0;
 }

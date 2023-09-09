@@ -6,14 +6,16 @@
 #include <netdb.h>
 
 #define PORT "3490"
-#define MAX_BUF_SIZE 256
+#define MAX_LEN 256
 
 int main(int argc, char **argv) {
     struct addrinfo hints, *res;
     int status, sockfd;
-    char buf[MAX_BUF_SIZE];
+
+    char msg[MAX_LEN];
+    char buf[MAX_LEN];
     size_t len;
-    ssize_t bytes_recv;
+    ssize_t bytes_recv, bytes_send;
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET;          // IPv4
@@ -44,19 +46,35 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    // Receive message from the server
-    len = sizeof buf; 
-    bytes_recv = recv(sockfd, buf, len - 1, 0);
+    while (1) {
+        // Sending message to server 
+        printf("You: ");
+        scanf("%[^\n]%*c", msg);
 
-    if (bytes_recv == -1) {
-        perror("recv");
-        return 1;
+        len = strlen(msg);
+        bytes_send = send(sockfd, msg, len, 0);
+
+        if (bytes_send == -1) {
+            perror("send");
+            return 1;
+        }
+
+        // Receive message from the server
+        bzero(buf, sizeof buf);
+        len = sizeof buf; 
+        bytes_recv = recv(sockfd, buf, len - 1, 0);
+
+        if (bytes_recv == -1) {
+            perror("recv");
+            return 1;
+        }
+
+        buf[bytes_recv] = '\0';
+        printf("Server: %s\n", buf);
+        bzero(buf, sizeof buf);
     }
 
-    buf[bytes_recv] = '\0';
-
-    // Printing the message and closing the socket
-    printf("Received: %s\n", buf);
+    // Cleaning up by closing the socket
     close(sockfd);
 
     return 0;
